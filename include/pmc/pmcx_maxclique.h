@@ -37,7 +37,7 @@ using namespace std;
 
 namespace pmc {
 
-    class pmcx_maxclique {
+    class __declspec(dllexport)  pmcx_maxclique {
         public:
             vector<int>* edges;
             vector<long long>* vertices;

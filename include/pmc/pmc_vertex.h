@@ -23,7 +23,7 @@
 using namespace std;
 
 namespace pmc {
-    class Vertex {
+    class __declspec(dllexport) Vertex {
         private:
             int id, b;
         public:

@@ -35,17 +35,17 @@
 
 using namespace std;
 
-bool fexists(const char *filename);
-void usage(char *argv0);
+bool __declspec(dllexport) fexists(const char *filename);
+void __declspec(dllexport) usage(char *argv0);
 
-double get_time();
+double __declspec(dllexport) get_time();
 string memory_usage();
 
 void validate(bool condition, const string& msg);
 
 void indent(int level);
 void indent(int level, string str);
-void print_max_clique(vector<int>& max_clique_data);
+void __declspec(dllexport) print_max_clique(vector<int>& max_clique_data);
 void print_n_maxcliques(set< vector<int> > C, int n);
 
 int getdir (string dir, vector<string> &files);

@@ -26,7 +26,7 @@
 using namespace std;
 
 namespace pmc {
-class input {
+class __declspec(dllexport) input {
     public:
         // instance variables
         int algorithm;

@@ -29,7 +29,7 @@
 
 namespace pmc {
 
-    class pmc_heu {
+    class __declspec(dllexport)  pmc_heu {
         public:
             vector<int>* E;
             vector<long long>* V;

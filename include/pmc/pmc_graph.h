@@ -33,7 +33,7 @@
 
 
 namespace pmc {
-    class pmc_graph {
+class __declspec(dllexport)  pmc_graph {
         private:
             // helper functions
             void read_mtx(const string& filename);
