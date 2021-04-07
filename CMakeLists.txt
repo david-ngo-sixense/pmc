@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(pmc VERSION 1.0.0)
 
+include_directories("C:/dev/libunistd/unistd")
+link_directories("C:/dev/libunistd/build/Release")
+set(LIBUNISTD_LIB "C:/dev/libunistd/build/Release/libunistd.lib")
+
 set(PMC_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/pmc_heu.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/pmc_maxclique.cpp
@@ -21,10 +25,10 @@ target_include_directories(pmc PUBLIC
         )
 
 add_executable(pmc_main pmc_driver.cpp)
-target_link_libraries(pmc_main pmc)
+target_link_libraries(pmc_main pmc ${LIBUNISTD_LIB})
 
 find_package(OpenMP REQUIRED)
-target_link_libraries(pmc OpenMP::OpenMP_CXX)
+target_link_libraries(pmc OpenMP::OpenMP_CXX ${LIBUNISTD_LIB})
 target_link_libraries(pmc_main OpenMP::OpenMP_CXX)
 
 # Installation
