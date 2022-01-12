@@ -80,16 +80,21 @@ install(FILES cmake/pmcConfig.cmake
         )
 
 
-install(TARGETS pmc
-        EXPORT CMakeExternalTargets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        )
-		
-install(EXPORT CMakeExternalTargets
-	NAMESPACE CMakeExternal::
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CMakeExternal
-	COMPONENT Devel)
+# install(TARGETS pmc
+        # EXPORT CMakeExternalTargets
+        # LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        # ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        # )
+# install(TARGETS pmc_main
+        # EXPORT CMakeExternalTargets
+        # LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        # ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        # )
+# # Install
+# install(EXPORT CMakeExternalTargets
+	# NAMESPACE CMakeExternal::
+	# DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CMakeExternal
+	# COMPONENT Devel)
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(cmake/CMakeExternalConfig.cmake.in
