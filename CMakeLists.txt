@@ -108,5 +108,5 @@ install(
 include_directories(${CMAKE_BINARY_DIR}/libunistd-src/unistd)
 # link_directories("C:/dev/libunistd/build/Release")
 set(LIBUNISTD_LIB ${CMAKE_BINARY_DIR}/libunistd-build/Release/libunistd.lib)
-target_link_libraries(pmc ${LIBUNISTD_LIB})
-target_link_libraries(pmc_main ${LIBUNISTD_LIB})
+target_link_libraries(pmc PUBLIC ${LIBUNISTD_LIB})
+target_link_libraries(pmc_main PUBLIC ${LIBUNISTD_LIB})
