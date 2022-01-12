@@ -28,7 +28,7 @@
 #include <algorithm>
 
 namespace pmc {
-
+#ifdef _WIN32
     class __declspec(dllexport)  pmc_heu {
         public:
             vector<int>* E;
@@ -82,5 +82,63 @@ namespace pmc {
 
             inline void print_info(vector<int> C_max);
     };
+	
+	#endif
+
+#ifdef linux	
+class pmc_heu {
+        public:
+            vector<int>* E;
+            vector<long long>* V;
+            vector<int>* K;
+            vector<int>* order;
+            vector<int>* degree;
+            double sec;
+            int ub;
+            string strat;
+
+            pmc_heu(pmc_graph& G, input& params) {
+                K = G.get_kcores();
+                order = G.get_kcore_ordering();
+                ub = params.ub;
+                strat = params.heu_strat;
+                initialize();
+            }
+
+            pmc_heu(pmc_graph& G, int tmp_ub) {
+                K = G.get_kcores();
+                order = G.get_kcore_ordering();
+                ub = tmp_ub;
+                strat = "kcore";
+                initialize();
+            }
+
+            inline void initialize() {
+                sec = get_time();
+                srand (time(NULL));
+            };
+
+            int strategy(vector<int>& P);
+            void set_strategy(string s) { strat = s; }
+            int compute_heuristic(int v);
+
+            static bool desc_heur(Vertex v,  Vertex u) {
+                return (v.get_bound() > u.get_bound());
+            }
+
+            static bool incr_heur(Vertex v,  Vertex u) {
+                return (v.get_bound() < u.get_bound());
+            }
+
+            int search(pmc_graph& graph, vector<int>& C_max);
+            int search_cores(pmc_graph& graph, vector<int>& C_max, int lb);
+            int search_bounds(pmc_graph& graph, vector<int>& C_max);
+
+            inline void branch(vector<Vertex>& P, int sz,
+                    int& mc, vector<int>& C, vector<short>& ind);
+
+            inline void print_info(vector<int> C_max);
+    };
+	#endif
 };
 #endif

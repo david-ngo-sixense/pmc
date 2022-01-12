@@ -23,6 +23,7 @@
 using namespace std;
 
 namespace pmc {
+	#ifdef _WIN32
     class __declspec(dllexport) Vertex {
         private:
             int id, b;
@@ -36,6 +37,22 @@ namespace pmc {
             int get_bound()             { return b; }
     };
 
+#endif
+
+#ifdef linux		
+class Vertex {
+        private:
+            int id, b;
+        public:
+            Vertex(int vertex_id, int bound): id(vertex_id), b(bound) {};
+
+            void set_id(int vid)        { id = vid; }
+            int get_id()                { return id; }
+
+            void set_bound(int value)   { b = value; }
+            int get_bound()             { return b; }
+    };
+#endif
     static bool decr_bound(Vertex v,  Vertex u) {
         return (v.get_bound() > u.get_bound());
     }

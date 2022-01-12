@@ -12,14 +12,13 @@ set(CMAKE_BUILD_TYPE "Release" CACHE STRING
 
 project(pmc VERSION 1.0.0)
 
-# Build Dependencies
-add_subdirectory(cmake)
-
-	
-include_directories(${CMAKE_BINARY_DIR}/libunistd-src/unistd)
-# link_directories("C:/dev/libunistd/build/Release")
-set(LIBUNISTD_LIB ${CMAKE_BINARY_DIR}/libunistd-build/Release/libunistd.lib)
-
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+	# Build Dependencies
+	add_subdirectory(cmake)
+	include_directories(${CMAKE_BINARY_DIR}/libunistd-src/unistd)
+	# link_directories("C:/dev/libunistd/build/Release")
+	set(LIBUNISTD_LIB ${CMAKE_BINARY_DIR}/libunistd-build/Release/libunistd.lib)
+endif()
 	
 set(PMC_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/pmc_heu.cpp
@@ -34,8 +33,12 @@ set(PMC_SOURCE_FILES
  
 
 add_library(pmc SHARED ${PMC_SOURCE_FILES})
-target_link_libraries(pmc PUBLIC ${LIBUNISTD_LIB})
-add_dependencies(pmc libunistd) # very important. If not, pmc is compiled before libunistd is compiled 
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+	target_link_libraries(pmc PUBLIC ${LIBUNISTD_LIB})
+	add_dependencies(pmc libunistd) # very important. If not, pmc is compiled before libunistd is compiled
+endif()
+
+ 
 target_include_directories(pmc PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -45,7 +48,10 @@ target_include_directories(pmc PUBLIC
 add_executable(pmc_main pmc_driver.cpp)
 # target_link_libraries(pmc_main pmc ${LIBUNISTD_LIB})
 target_link_libraries(pmc_main PUBLIC pmc)
-target_link_libraries(pmc_main PUBLIC ${LIBUNISTD_LIB})
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+	target_link_libraries(pmc_main PUBLIC ${LIBUNISTD_LIB})
+endif()
 
 find_package(OpenMP REQUIRED)
 # target_link_libraries(pmc OpenMP::OpenMP_CXX ${LIBUNISTD_LIB})
@@ -95,7 +101,8 @@ install(FILES cmake/pmcConfig.cmake
 	# NAMESPACE CMakeExternal::
 	# DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CMakeExternal
 	# COMPONENT Devel)
-
+	
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 include(CMakePackageConfigHelpers)
 configure_package_config_file(cmake/CMakeExternalConfig.cmake.in
 	"${PROJECT_BINARY_DIR}/CMakeExternalConfig.cmake"
@@ -112,3 +119,4 @@ install(
 	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeExternal"
 	COMPONENT Devel)
 
+endif()

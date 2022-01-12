@@ -35,17 +35,30 @@
 
 using namespace std;
 
+#ifdef _WIN32
+
 bool __declspec(dllexport) fexists(const char *filename);
 void __declspec(dllexport) usage(char *argv0);
 
 double __declspec(dllexport) get_time();
+void __declspec(dllexport) print_max_clique(vector<int>& max_clique_data);
+#endif
+
+#ifdef linux
+bool fexists(const char *filename);
+void usage(char *argv0);
+
+double get_time();
+void print_max_clique(vector<int>& max_clique_data);
+#endif
+
 string memory_usage();
 
 void validate(bool condition, const string& msg);
 
 void indent(int level);
 void indent(int level, string str);
-void __declspec(dllexport) print_max_clique(vector<int>& max_clique_data);
+
 void print_n_maxcliques(set< vector<int> > C, int n);
 
 int getdir (string dir, vector<string> &files);
