@@ -33,6 +33,7 @@ compiled source #
 *.png
 *.eps
 *.jpg
+*.bak
 
 # OS generated files #
 ######################
