@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(pmc VERSION 1.0.0)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake") 
 
 # Apple: Don't modify install_name when touching RPATH.
 if(POLICY CMP0068)
@@ -10,11 +9,18 @@ endif()
 # Force default build type to Release
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING
 	"Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel.")
-	
-# include_directories("C:/dev/libunistd/unistd")
-# link_directories("C:/dev/libunistd/build/Release")
-# set(LIBUNISTD_LIB "C:/dev/libunistd/build/Release/libunistd.lib")
 
+project(pmc VERSION 1.0.0)
+
+# Build Dependencies
+add_subdirectory(cmake)
+
+	
+include_directories(${CMAKE_BINARY_DIR}/libunistd-src/unistd)
+# link_directories("C:/dev/libunistd/build/Release")
+set(LIBUNISTD_LIB ${CMAKE_BINARY_DIR}/libunistd-build/Release/libunistd.lib)
+
+	
 set(PMC_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/pmc_heu.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/pmc_maxclique.cpp
@@ -28,7 +34,8 @@ set(PMC_SOURCE_FILES
  
 
 add_library(pmc SHARED ${PMC_SOURCE_FILES})
-
+target_link_libraries(pmc ${LIBUNISTD_LIB})
+add_dependencies(pmc libunistd) # very important. If not, pmc is compiled before libunistd is compiled 
 target_include_directories(pmc PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -38,6 +45,7 @@ target_include_directories(pmc PUBLIC
 add_executable(pmc_main pmc_driver.cpp)
 # target_link_libraries(pmc_main pmc ${LIBUNISTD_LIB})
 target_link_libraries(pmc_main pmc)
+target_link_libraries(pmc_main ${LIBUNISTD_LIB})
 
 find_package(OpenMP REQUIRED)
 # target_link_libraries(pmc OpenMP::OpenMP_CXX ${LIBUNISTD_LIB})
@@ -71,24 +79,22 @@ install(FILES cmake/pmcConfig.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pmc
         )
 
-# Build Dependencies
-add_subdirectory(cmake)
 
-# install(TARGETS pmc
-        # EXPORT CMakeExternalTargets
-        # LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        # ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        # )
-# install(TARGETS pmc_main
-        # EXPORT CMakeExternalTargets
-        # LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        # ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        # )
-# # Install
-# install(EXPORT CMakeExternalTargets
-	# NAMESPACE CMakeExternal::
-	# DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CMakeExternal
-	# COMPONENT Devel)
+install(TARGETS pmc
+        EXPORT CMakeExternalTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
+install(TARGETS pmc_main
+        EXPORT CMakeExternalTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
+# Install
+install(EXPORT CMakeExternalTargets
+	NAMESPACE CMakeExternal::
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CMakeExternal
+	COMPONENT Devel)
 include(CMakePackageConfigHelpers)
 configure_package_config_file(cmake/CMakeExternalConfig.cmake.in
 	"${PROJECT_BINARY_DIR}/CMakeExternalConfig.cmake"
@@ -104,9 +110,4 @@ install(
 	"${PROJECT_BINARY_DIR}/CMakeExternalConfigVersion.cmake"
 	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeExternal"
 	COMPONENT Devel)
-	
-include_directories(${CMAKE_BINARY_DIR}/libunistd-src/unistd)
-# link_directories("C:/dev/libunistd/build/Release")
-set(LIBUNISTD_LIB ${CMAKE_BINARY_DIR}/libunistd-build/Release/libunistd.lib)
-target_link_libraries(pmc_main  ${LIBUNISTD_LIB})
-target_link_libraries(pmc  ${LIBUNISTD_LIB}) # not necessary because pmc_main depend on pmc
+
