@@ -34,7 +34,7 @@ set(PMC_SOURCE_FILES
  
 
 add_library(pmc SHARED ${PMC_SOURCE_FILES})
-target_link_libraries(pmc ${LIBUNISTD_LIB})
+target_link_libraries(pmc PUBLIC ${LIBUNISTD_LIB})
 add_dependencies(pmc libunistd) # very important. If not, pmc is compiled before libunistd is compiled 
 target_include_directories(pmc PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -44,13 +44,13 @@ target_include_directories(pmc PUBLIC
 
 add_executable(pmc_main pmc_driver.cpp)
 # target_link_libraries(pmc_main pmc ${LIBUNISTD_LIB})
-target_link_libraries(pmc_main pmc)
-target_link_libraries(pmc_main ${LIBUNISTD_LIB})
+target_link_libraries(pmc_main PUBLIC pmc)
+target_link_libraries(pmc_main PUBLIC ${LIBUNISTD_LIB})
 
 find_package(OpenMP REQUIRED)
 # target_link_libraries(pmc OpenMP::OpenMP_CXX ${LIBUNISTD_LIB})
-target_link_libraries(pmc OpenMP::OpenMP_CXX)
-target_link_libraries(pmc_main OpenMP::OpenMP_CXX)
+target_link_libraries(pmc PUBLIC OpenMP::OpenMP_CXX)
+target_link_libraries(pmc_main PUBLIC OpenMP::OpenMP_CXX)
 
 # Installation
 include(GNUInstallDirs)
