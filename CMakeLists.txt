@@ -13,11 +13,23 @@ set(CMAKE_BUILD_TYPE "Release" CACHE STRING
 project(pmc VERSION 1.0.0)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-	# Build Dependencies
-	add_subdirectory(cmake)
-	include_directories(${CMAKE_BINARY_DIR}/libunistd-src/unistd)
-	# link_directories("C:/dev/libunistd/build/Release")
-	set(LIBUNISTD_LIB ${CMAKE_BINARY_DIR}/libunistd-build/Release/libunistd.lib)
+	# # Build Dependencies
+	# add_subdirectory(cmake)
+	# include_directories(${CMAKE_BINARY_DIR}/libunistd-src/unistd)
+	# # link_directories("C:/dev/libunistd/build/Release")
+	# set(LIBUNISTD_LIB ${CMAKE_BINARY_DIR}/libunistd-build/Release/libunistd.lib)
+	
+	# libunistd  
+configure_file(cmake/libunistd.CMakeLists.txt.in libunistd-download/CMakeLists.txt)
+execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libunistd-download")
+execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libunistd-download")
+add_subdirectory("${CMAKE_BINARY_DIR}/libunistd-src"
+        "${CMAKE_BINARY_DIR}/libunistd-build")
+
+include_directories(${CMAKE_BINARY_DIR}/libunistd-src/unistd)
+set(LIBUNISTD_LIB ${CMAKE_BINARY_DIR}/libunistd-build/Release/libunistd.lib)
 endif()
 	
 set(PMC_SOURCE_FILES
@@ -33,17 +45,14 @@ set(PMC_SOURCE_FILES
  
 
 add_library(pmc SHARED ${PMC_SOURCE_FILES})
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 	target_link_libraries(pmc PUBLIC ${LIBUNISTD_LIB})
 	add_dependencies(pmc libunistd) # very important. If not, pmc is compiled before libunistd is compiled
 endif()
 
  
-target_include_directories(pmc PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-        )
+
 
 add_executable(pmc_main pmc_driver.cpp)
 # target_link_libraries(pmc_main pmc ${LIBUNISTD_LIB})
@@ -58,34 +67,51 @@ find_package(OpenMP REQUIRED)
 target_link_libraries(pmc PUBLIC OpenMP::OpenMP_CXX)
 target_link_libraries(pmc_main PUBLIC OpenMP::OpenMP_CXX)
 
+
+
+
+
 # Installation
 include(GNUInstallDirs)
-
+ 
+target_include_directories(pmc PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        )
+		
 install(TARGETS pmc
         EXPORT pmc-export
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+		RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
         )
+	 
+list(APPEND PMC_EXPORTED_TARGETS pmc)
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+	list(APPEND PMC_EXPORTED_TARGETS libportable libunistd liblmdb libregex libsqlite libuuid libxxhash)
+endif()
 
-export(
-        EXPORT pmc-export
-        FILE ${CMAKE_CURRENT_BINARY_DIR}/pmcTargets.cmake
-        NAMESPACE pmc::
-)
 
 install(EXPORT pmc-export
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pmc
         NAMESPACE pmc::
         FILE pmcTargets.cmake
         )
+		
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+set(PMC_EXPORTED_TARGETS "${PMC_EXPORTED_TARGETS}")
+
+export(TARGETS ${PMC_EXPORTED_TARGETS} FILE pmc-exports.cmake)
 install(FILES cmake/pmcConfig.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pmc
         )
-
-
+ 
+ 
+message("PMC_EXPORTED_TARGETS:  ${PMC_EXPORTED_TARGETS}")
+		
 # install(TARGETS pmc
         # EXPORT CMakeExternalTargets
         # LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -102,21 +128,4 @@ install(FILES cmake/pmcConfig.cmake
 	# DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CMakeExternal
 	# COMPONENT Devel)
 	
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-include(CMakePackageConfigHelpers)
-configure_package_config_file(cmake/CMakeExternalConfig.cmake.in
-	"${PROJECT_BINARY_DIR}/CMakeExternalConfig.cmake"
-	INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeExternal"
-	NO_SET_AND_CHECK_MACRO
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-write_basic_package_version_file(
-	"${PROJECT_BINARY_DIR}/CMakeExternalConfigVersion.cmake"
-	COMPATIBILITY SameMajorVersion)
-install(
-	FILES
-	"${PROJECT_BINARY_DIR}/CMakeExternalConfig.cmake"
-	"${PROJECT_BINARY_DIR}/CMakeExternalConfigVersion.cmake"
-	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CMakeExternal"
-	COMPONENT Devel)
-
-endif()
+ 
