@@ -5,11 +5,11 @@ project(libunistd-download NONE)
 
 include(ExternalProject)
 ExternalProject_Add(libunistd_project
-	GIT_REPOSITORY https://github.com/robinrowe/libunistd
-	GIT_TAG "master"
+	GIT_REPOSITORY https://github.com/robinrowe/libunistd.git
+	# GIT_TAG "master"
 	#GIT_TAG "v0.3.5"
-	SOURCE_DIR "${CMAKE_BINARY_DIR}/libunistd-src"
-	BINARY_DIR "${CMAKE_BINARY_DIR}/libunistd-build"
+	SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/libunistd-src"
+	BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/libunistd-build"
 	UPDATE_COMMAND ""
 	# PATCH_COMMAND git apply "${CMAKE_SOURCE_DIR}/patches/glog.patch"
 	CONFIGURE_COMMAND ""
